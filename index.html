@@ -995,53 +995,40 @@
             });
         }
         
-    function updateCountdown() {
-        let targetDate;
+    
+function updateCountdown() {
+    // Set fixed target date: 180 days from May 9, 2025 → November 5, 2025
+    const targetDate = new Date('2025-11-05T00:00:00');
 
-        // Check if we already saved the target date
-        if (localStorage.getItem('forgeItCountdownTarget')) {
-            targetDate = new Date(localStorage.getItem('forgeItCountdownTarget'));
-        } else {
-            // First time: set target to 180 days from now and save it
-            targetDate = new Date();
-            targetDate.setDate(targetDate.getDate() + 180);
-            localStorage.setItem('forgeItCountdownTarget', targetDate.toISOString());
+    function update() {
+        const now = new Date();
+        const diff = targetDate - now;
+
+        if (diff <= 0) {
+            document.getElementById('countdownDays').textContent = '00';
+            document.getElementById('countdownHours').textContent = '00';
+            document.getElementById('countdownMinutes').textContent = '00';
+            document.getElementById('countdownSeconds').textContent = '00';
+            return;
         }
 
-        function update() {
-            const now = new Date();
-            const diff = targetDate - now;
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-            if (diff <= 0) {
-                // Countdown finished
-                document.getElementById('countdownDays').textContent = '00';
-                document.getElementById('countdownHours').textContent = '00';
-                document.getElementById('countdownMinutes').textContent = '00';
-                document.getElementById('countdownSeconds').textContent = '00';
-                return;
-            }
-
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-            document.getElementById('countdownDays').textContent = days.toString().padStart(2, '0');
-            document.getElementById('countdownHours').textContent = hours.toString().padStart(2, '0');
-            document.getElementById('countdownMinutes').textContent = minutes.toString().padStart(2, '0');
-            document.getElementById('countdownSeconds').textContent = seconds.toString().padStart(2, '0');
-        }
-
-        // Update immediately
-        update();
-
-        // Update every second
-        setInterval(update, 1000);
+        document.getElementById('countdownDays').textContent = days.toString().padStart(2, '0');
+        document.getElementById('countdownHours').textContent = hours.toString().padStart(2, '0');
+        document.getElementById('countdownMinutes').textContent = minutes.toString().padStart(2, '0');
+        document.getElementById('countdownSeconds').textContent = seconds.toString().padStart(2, '0');
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        updateCountdown();
-    });
+    update();
+    setInterval(update, 1000);
+}
+
+// Initialize countdown when page loads
+document.addEventListener('DOMContentLoaded', updateCountdown);
 
 
         // Mobile menu toggle
