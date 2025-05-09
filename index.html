@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forge It - Community-Backed Prop Firm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --dark: #0f172a;
+            --darker: #0a0f1f;
+            --electric-blue: #0061ff;
+            --violet: #7928ca;
+            --mint: #00f2c3;
+            --magenta: #ff0080;
+            --teal: #00c4cc;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--darker);
+            color: #ffffff;
+            scroll-behavior: smooth;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e293b, var(--darker));
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, var(--dark) 0%, #1e1b4b 100%);
+        }
+        
+        .counter {
+            font-feature-settings: "tnum";
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .glow {
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+        }
+        
+        .glow:hover {
+            box-shadow: 0 0 25px rgba(99, 102, 241, 0.8);
+        }
+        
+        .sticky-nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(10px);
+            background-color: rgba(10, 15, 31, 0.8);
+            transition: all 0.3s ease;
+        }
+        
+        .sticky-nav.scrolled {
+            background-color: rgba(10, 15, 31, 0.95);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-link {
+            position: relative;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(15, 23, 42, 0.6);
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(99, 102, 241, 0.5);
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            background: rgba(99, 102, 241, 0.1);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.1);
+        }
+        
+        /* Money counter styles */
+        .money-counter {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            background: linear-gradient(90deg, var(--electric-blue), #00d1ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        /* Countdown timer styles */
+        .countdown-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 8px;
+            padding: 1rem;
+            min-width: 80px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        .countdown-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .countdown-label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.25rem;
+        }
+        
+        /* Funding ring styles */
+        .funding-ring {
+            width: 280px;
+            height: 280px;
+            position: relative;
+            margin: 0 auto;
+        }
+        
+        .funding-total {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        
+        .funding-total-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            background: linear-gradient(90deg, var(--electric-blue), #00d1ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.25rem;
+        }
+        
+        .funding-total-label {
+            font-size: 1rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+        
+        .funding-legend {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .funding-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .funding-item:hover {
+            background-color: rgba(15, 23, 42, 0.6);
+            transform: translateY(-2px);
+        }
+        
+        .funding-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+        }
+        
+        .funding-label {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #e2e8f0;
+            margin-bottom: 0.25rem;
+        }
+        
+        .funding-amount {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+        
+        .segment-hover {
+            opacity: 1;
+            transition: opacity 0.2s ease;
+        }
+        
+        .segment-hover:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+        
+        /* Timeline styles */
+        .timeline {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -1px;
+        }
+        
+        .timeline-container {
+            padding: 10px 40px;
+            position: relative;
+            width: 50%;
+            box-sizing: border-box;
+        }
+        
+        .timeline-container::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            top: 15px;
+            z-index: 1;
+        }
+        
+        .left {
+            left: 0;
+        }
+        
+        .right {
+            left: 50%;
+        }
+        
+        .left::after {
+            right: -10px;
+        }
+        
+        .right::after {
+            left: -10px;
+        }
+        
+        .timeline-content {
+            padding: 20px;
+            background-color: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .timeline-content:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Stats cards */
+        .stat-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.8));
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(99, 102, 241, 0.1);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+        
+        /* Responsive adjustments */
+        @media screen and (max-width: 768px) {
+            .timeline::after {
+                left: 31px;
+            }
+            
+            .timeline-container {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 25px;
+            }
+            
+            .timeline-container::after {
+                left: 21px;
+            }
+            
+            .left::after, .right::after {
+                left: 21px;
+            }
+            
+            .right {
+                left: 0%;
+            }
+            
+            .timeline-content {
+                padding: 15px;
+            }
+            
+            .funding-ring {
+                width: 240px;
+                height: 240px;
+            }
+            
+            .funding-legend {
+                grid-template-columns: 1fr;
+            }
+            
+            .money-counter {
+                font-size: 2rem;
+            }
+            
+            .hero-headline {
+                font-size: 2.5rem;
+            }
+        }
+        
+        /* Animation for section entrance */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-section {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+        
+        /* Hamburger menu for mobile */
+        .hamburger {
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            transition: all 0.25s;
+            position: relative;
+        }
+        
+        .hamburger-top,
+        .hamburger-middle,
+        .hamburger-bottom {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 24px;
+            height: 2px;
+            background: white;
+            transform: rotate(0);
+            transition: all 0.5s;
+        }
+        
+        .hamburger-middle {
+            transform: translateY(7px);
+        }
+        
+        .hamburger-bottom {
+            transform: translateY(14px);
+        }
+        
+        .open .hamburger-top {
+            transform: rotate(45deg) translateY(6px) translate(6px);
+        }
+        
+        .open .hamburger-middle {
+            display: none;
+        }
+        
+        .open .hamburger-bottom {
+            transform: rotate(-45deg) translateY(6px) translate(-6px);
+        }
+        
+        /* Mobile menu */
+        .mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+        
+        .mobile-menu.open {
+            max-height: 500px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sticky Navigation -->
+    <header class="sticky-nav border-b border-gray-800/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <i class="fas fa-hammer text-2xl mr-2 gradient-text"></i>
+                    <span class="text-xl font-bold text-white">FORGE IT</span>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#about" class="nav-link text-gray-300 hover:text-white">About</a>
+                    <a href="#funding" class="nav-link text-gray-300 hover:text-white">Funding</a>
+                    <a href="#updates" class="nav-link text-gray-300 hover:text-white">Updates</a>
+                    <a href="#community" class="nav-link text-gray-300 hover:text-white">Community</a>
+                    <a href="https://buy.stripe.com/8wMeWQ9Ln7Ru6GIdQQ" class="nav-link text-gray-300 hover:text-white">Donate</a>
+                    <a href="https://discord.gg/gGXEub4B" target="_blank" class="btn-primary">
+                        <i class="fab fa-discord mr-2"></i> Join Discord
+                    </a>
+                </nav>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <a href="https://discord.gg/gGXEub4B" target="_blank" class="btn-primary mr-4 hidden sm:inline-block">
+                        <i class="fab fa-discord mr-2"></i> Join
+                    </a>
+                    <button id="menu-btn" class="hamburger focus:outline-none">
+                        <span class="hamburger-top"></span>
+                        <span class="hamburger-middle"></span>
+                        <span class="hamburger-bottom"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="mobile-menu md:hidden bg-[#0a0f1f]">
+            <div class="px-4 pt-2 pb-8 space-y-2">
+                <a href="#about" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">About</a>
+                <a href="#funding" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Funding</a>
+                <a href="#updates" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Updates</a>
+                <a href="#community" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Community</a>
+                <a href="https://buy.stripe.com/8wMeWQ9Ln7Ru6GIdQQ" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800">Donate</a>
+                <a href="https://discord.gg/gGXEub4B" target="_blank" class="block px-3 py-2 rounded-md text-base font-medium text-center text-white bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] mt-4">
+                    <i class="fab fa-discord mr-2"></i> Join Discord
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero-gradient min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-20 pb-32">
+        <div class="max-w-6xl mx-auto text-center animate-section">
+            <h1 class="hero-headline text-4xl md:text-6xl font-bold mb-8 leading-tight">
+                Help Build the World's First <br>
+                <span class="gradient-text">£1 Million Community-Backed Prop Firm</span>
+            </h1>
+            
+            <div class="max-w-3xl mx-auto mb-12">
+                <p class="text-xl text-gray-300">
+                    Join us in creating a revolutionary prop trading firm owned and governed by traders like you.
+                </p>
+            </div>
+            
+            <!-- Money Counter -->
+            <div class="mb-12">
+                <div class="money-counter mb-2">
+                    £<span id="moneyCounter">0</span> raised of £1,000,000 goal
+                </div>
+                <div class="w-full bg-gray-800 rounded-full h-3 max-w-2xl mx-auto">
+                    <div class="h-3 rounded-full" style="background: linear-gradient(90deg, var(--electric-blue), #00d1ff); width: 0%; transition: width 1s ease;" id="moneyProgress"></div>
+                </div>
+            </div>
+            
+            <!-- Countdown Timer -->
+            <div class="flex justify-center space-x-4 mb-12">
+                <div class="countdown-item">
+                    <div class="countdown-value" id="countdownDays">180</div>
+                    <div class="countdown-label">Days</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-value" id="countdownHours">00</div>
+                    <div class="countdown-label">Hours</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-value" id="countdownMinutes">00</div>
+                    <div class="countdown-label">Minutes</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-value" id="countdownSeconds">00</div>
+                    <div class="countdown-label">Seconds</div>
+                </div>
+            </div>
+            
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+                <a href="https://discord.gg/gGXEub4B" target="_blank" class="btn-primary">
+                    <i class="fab fa-discord mr-2"></i> Join Our Discord
+                </a>
+                <a href="https://buy.stripe.com/8wMeWQ9Ln7Ru6GIdQQ" class="btn-secondary">
+                    <i class="fas fa-donate mr-2"></i> Donate Now
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 px-4 sm:px-6 lg:px-8 bg-[#0f172a]">
+        <div class="max-w-4xl mx-auto animate-section">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    <span class="gradient-text">The Forge It Vision</span>
+                </h2>
+                <p class="text-lg text-gray-300 max-w-3xl mx-auto">
+                    A prop firm built differently — by traders, for traders
+                </p>
+            </div>
+            
+            <div class="bg-gray-800/50 border border-gray-700 rounded-xl p-8 md:p-10">
+                <p class="text-lg text-gray-300 mb-6">
+                    Forge It is a newly launched, faceless but fully transparent prop firm — built by traders, for traders. We are creating a system that removes corporate investors and gives the power back to the community.
+                </p>
+                
+                <p class="text-lg text-gray-300 mb-8">
+                    Every pound we raise will be used for:
+                </p>
+                
+                <ul class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <li class="flex items-start">
+                        <i class="fas fa-microchip text-indigo-400 mt-1 mr-3"></i>
+                        <span class="text-gray-300">Cutting-edge tech + MT4/MT5 integrations</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-balance-scale text-purple-400 mt-1 mr-3"></i>
+                        <span class="text-gray-300">Legal + regulatory setup</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-money-bill-wave text-blue-400 mt-1 mr-3"></i>
+                        <span class="text-gray-300">Early trader payouts</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-bullhorn text-pink-400 mt-1 mr-3"></i>
+                        <span class="text-gray-300">Marketing + community growth</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fas fa-medal text-green-400 mt-1 mr-3"></i>
+                        <span class="text-gray-300">Rewarding early backers</span>
+                    </li>
+                </ul>
+                
+                <div class="bg-indigo-900/20 border border-indigo-800 rounded-lg p-6">
+                    <p class="text-gray-300">
+                        <i class="fas fa-rocket text-indigo-400 mr-2"></i>
+                        <strong>Today is launch day:</strong> zero members, zero donations yet, and open for the first pioneers. Join us to make fintech history.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Funding Allocation Section -->
+    <section id="funding" class="py-20 px-4 sm:px-6 lg:px-8 bg-[#0f172a]">
+        <div class="max-w-7xl mx-auto animate-section">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    <span class="gradient-text">Funding Allocation</span>
+                </h2>
+                <p class="text-lg text-gray-300 max-w-3xl mx-auto">
+                    How we'll invest the £1,000,000 funding goal
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <div class="funding-ring">
+                        <canvas id="fundingChart"></canvas>
+                        <div class="funding-total">
+                            <div class="funding-total-value">£1,000,000</div>
+                            <div class="funding-total-label">Total Funding Goal</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="funding-legend">
+                        <div class="funding-item segment-hover" data-category="0">
+                            <div class="funding-color" style="background-color: var(--electric-blue);"></div>
+                            <div>
+                                <div class="funding-label">Tech & Licenses</div>
+                                <div class="funding-amount">£400,000 (40%)</div>
+                            </div>
+                        </div>
+                        
+                        <div class="funding-item segment-hover" data-category="1">
+                            <div class="funding-color" style="background-color: var(--violet);"></div>
+                            <div>
+                                <div class="funding-label">Legal & Compliance</div>
+                                <div class="funding-amount">£200,000 (20%)</div>
+                            </div>
+                        </div>
+                        
+                        <div class="funding-item segment-hover" data-category="2">
+                            <div class="funding-color" style="background-color: var(--teal);"></div>
+                            <div>
+                                <div class="funding-label">Payout Reserve</div>
+                                <div class="funding-amount">£200,000 (20%)</div>
+                            </div>
+                        </div>
+                        
+                        <div class="funding-item segment-hover" data-category="3">
+                            <div class="funding-color" style="background-color: var(--magenta);"></div>
+                            <div>
+                                <div class="funding-label">Marketing & Growth</div>
+                                <div class="funding-amount">£100,000 (10%)</div>
+                            </div>
+                        </div>
+                        
+                        <div class="funding-item segment-hover" data-category="4">
+                            <div class="funding-color" style="background-color: var(--mint);"></div>
+                            <div>
+                                <div class="funding-label">Community Rewards</div>
+                                <div class="funding-amount">£100,000 (10%)</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-10 bg-gray-900/50 p-6 rounded-xl border border-gray-800/50">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-chart-line text-indigo-400 text-2xl"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-gray-300">
+                                    <span class="font-medium text-white">Live financial tracking:</span> We're developing a real-time dashboard where you can track every pound raised and spent.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Milestones Section -->
+    <section id="updates" class="py-20 px-4 sm:px-6 lg:px-8 bg-[#0f172a]">
+        <div class="max-w-6xl mx-auto animate-section">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    <span class="gradient-text">Project Milestones</span>
+                </h2>
+                <p class="text-lg text-gray-300 max-w-3xl mx-auto">
+                    Our journey to building the future of prop trading
+                </p>
+            </div>
+            
+            <div class="timeline">
+                <div class="timeline-container left">
+                    <div class="timeline-content">
+                        <h3 class="text-xl font-bold mb-2">Day 1: Project Launched</h3>
+                        <p class="text-gray-300">Today marks the official launch of Forge It. We're starting from zero and building something revolutionary.</p>
+                        <div class="mt-3 text-sm text-indigo-400 font-medium">May 9, 2025</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-container right">
+                    <div class="timeline-content">
+                        <h3 class="text-xl font-bold mb-2">First £10,000 Raised</h3>
+                        <p class="text-gray-300">Our first major milestone will be reaching £10,000 in community funding.</p>
+                        <div class="mt-3 text-sm text-indigo-400 font-medium">Coming soon</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-container left">
+                    <div class="timeline-content">
+                        <h3 class="text-xl font-bold mb-2">Backend Development Starts</h3>
+                        <p class="text-gray-300">With initial funding secured, we'll begin building the trading platform infrastructure.</p>
+                        <div class="mt-3 text-sm text-indigo-400 font-medium">Coming soon</div>
+                    </div>
+                </div>
+                
+                <!-- Space for future milestones -->
+                <div class="timeline-container right">
+                    <div class="timeline-content opacity-70">
+                        <h3 class="text-xl font-bold mb-2">Future Milestone</h3>
+                        <p class="text-gray-300">This space reserved for our next achievement.</p>
+                        <div class="mt-3 text-sm text-indigo-400 font-medium">Coming soon</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community Section -->
+    <section id="community" class="py-20 px-4 sm:px-6 lg:px-8 bg-[#0f172a]">
+        <div class="max-w-6xl mx-auto animate-section">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    <span class="gradient-text">Join Our Community</span>
+                </h2>
+                <p class="text-lg text-gray-300 max-w-3xl mx-auto">
+                    Be among the first to shape the future of prop trading
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8 mb-16">
+                <div class="stat-card">
+                    <div class="stat-value" id="discordCounter">0</div>
+                    <div class="stat-label">Discord Members</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value" id="donationCounter">0</div>
+                    <div class="stat-label">Donations</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value" id="waitlistCounter">0</div>
+                    <div class="stat-label">Waitlist Signups</div>
+                </div>
+            </div>
+            
+            <div class="text-center max-w-3xl mx-auto">
+                <p class="text-xl text-gray-300 mb-8">
+                    We're just getting started. Be one of the very first to join and help shape the direction of Forge It.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+                    <a href="https://discord.gg/gGXEub4B" target="_blank" class="btn-primary">
+                        <i class="fab fa-discord mr-2"></i> Join Discord
+                    </a>
+                    <a href="#" class="btn-secondary">
+                        <i class="fas fa-envelope mr-2"></i> Join Waitlist
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA Section -->
+    <section id="donate" class="py-20 px-4 sm:px-6 lg:px-8 hero-gradient">
+        <div class="max-w-4xl mx-auto text-center animate-section">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">
+                Be One of the First to <span class="gradient-text">Forge the Future</span>
+            </h2>
+            
+            <p class="text-xl text-gray-300 mb-10 max-w-3xl mx-auto">
+                Join our growing community of traders building the prop firm of tomorrow.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+                <a href="https://discord.gg/gGXEub4B" target="_blank" class="btn-primary">
+                    <i class="fab fa-discord mr-2"></i> Join Discord
+                </a>
+                <a href="https://buy.stripe.com/8wMeWQ9Ln7Ru6GIdQQ" class="btn-secondary">
+                    <i class="fas fa-donate mr-2"></i> Donate Now
+                </a>
+                <a href="https://www.instagram.com/forgeitprop?igsh=MTh3amxoMTcwM2s0Yg%3D%3D&utm_source=qr" class="btn-secondary">
+                    <i class="fab fa-instagram mr-2"></i> Follow Instagram
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-12 px-4 sm:px-6 lg:px-8 bg-[#0a0f1f] border-t border-gray-800/50">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-6 md:mb-0">
+                    <i class="fas fa-hammer text-2xl mr-3 gradient-text"></i>
+                    <span class="text-xl font-bold text-white">FORGE IT</span>
+                </div>
+                
+                <div class="flex space-x-6">
+                    <a href="https://discord.gg/gGXEub4B" class="text-gray-400 hover:text-white transition">
+                        <i class="fab fa-discord text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <i class="fab fa-twitter text-xl"></i>
+                    </a>
+                    <a href="https://www.instagram.com/forgeitprop?igsh=MTh3amxoMTcwM2s0Yg%3D%3D&utm_source=qr" class="text-gray-400 hover:text-white transition">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="mt-8 text-center md:text-left text-gray-500 text-sm">
+                <p>© 2025 Forge It. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function initFundingChart() {
+            const ctx = document.getElementById('fundingChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Tech & Licenses', 'Legal & Compliance', 'Payout Reserve', 'Marketing & Growth', 'Community Rewards'],
+                    datasets: [{
+                        data: [400000, 200000, 200000, 100000, 100000],
+                        backgroundColor: [
+                            '#4f46e5',  // electric blue (Tech & Licenses)
+                            '#9333ea',  // violet (Legal & Compliance)
+                            '#06b6d4',  // teal (Payout Reserve)
+                            '#f43f5e',  // magenta (Marketing & Growth)
+                            '#22c55e'   // mint green (Community Rewards)
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 15,
+                        borderColor: '#0f172a',
+                        spacing: 2,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: true,
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw;
+                                    const percentage = context.dataset.data[context.dataIndex] / 1000000 * 100;
+                                    return `${label}: £${value.toLocaleString()} (${percentage.toFixed(1)}%)`;
+                                }
+                            },
+                            bodyFont: {
+                                family: 'Inter',
+                                size: 14,
+                                weight: '500'
+                            },
+                            padding: 12,
+                            backgroundColor: '#0f172a',
+                            titleColor: '#e2e8f0',
+                            bodyColor: '#94a3b8',
+                            borderColor: '#1e293b',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            displayColors: false
+                        }
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    },
+                    onHover: (event, chartElement) => {
+                        if (event.native) {
+                            event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+                        }
+                    }
+                }
+            });
+    
+            const fundingItems = document.querySelectorAll('.funding-item');
+            fundingItems.forEach((item, index) => {
+                item.addEventListener('mouseenter', function() {
+                    chart.setActiveElements([{ datasetIndex: 0, index: index }]);
+                    chart.update();
+                });
+                item.addEventListener('mouseleave', function() {
+                    chart.setActiveElements([]);
+                    chart.update();
+                });
+            });
+        }
+    
+        document.addEventListener('DOMContentLoaded', initFundingChart);
+    
+
+            // Add hover effects to legend items
+            const fundingItems = document.querySelectorAll('.funding-item');
+            fundingItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    const category = this.getAttribute('data-category');
+                    chart.setActiveElements([{datasetIndex: 0, index: category}]);
+                    chart.update();
+                });
+                
+                item.addEventListener('mouseleave', function() {
+                    chart.setActiveElements([]);
+                    chart.update();
+                });
+            });
+        
+
+        // Animated counters
+        function animateCounters() {
+            // Money counter
+            const moneyCounter = document.getElementById('moneyCounter');
+            const moneyProgress = document.getElementById('moneyProgress');
+            const targetAmount = 0; // Start from 0
+            
+            let currentAmount = 0;
+            const duration = 2000;
+            const increment = targetAmount / (duration / 16);
+            
+            const moneyInterval = setInterval(() => {
+                currentAmount += increment;
+                if (currentAmount >= targetAmount) {
+                    clearInterval(moneyInterval);
+                    currentAmount = targetAmount;
+                }
+                moneyCounter.textContent = Math.floor(currentAmount).toLocaleString();
+                moneyProgress.style.width = `${(currentAmount / 1000000) * 100}%`;
+            }, 16);
+            
+            // Community counters
+            const counters = [
+                { element: 'discordCounter', target: 0 },
+                { element: 'donationCounter', target: 0 },
+                { element: 'waitlistCounter', target: 0 }
+            ];
+            
+            counters.forEach(counter => {
+                const element = document.getElementById(counter.element);
+                let current = 0;
+                const target = counter.target;
+                const duration = 1500;
+                const increment = target / (duration / 16);
+                
+                const interval = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        clearInterval(interval);
+                        current = target;
+                    }
+                    element.textContent = Math.floor(current).toLocaleString();
+                }, 16);
+            });
+        }
+        
+    function updateCountdown() {
+        let targetDate;
+
+        // Check if we already saved the target date
+        if (localStorage.getItem('forgeItCountdownTarget')) {
+            targetDate = new Date(localStorage.getItem('forgeItCountdownTarget'));
+        } else {
+            // First time: set target to 180 days from now and save it
+            targetDate = new Date();
+            targetDate.setDate(targetDate.getDate() + 180);
+            localStorage.setItem('forgeItCountdownTarget', targetDate.toISOString());
+        }
+
+        function update() {
+            const now = new Date();
+            const diff = targetDate - now;
+
+            if (diff <= 0) {
+                // Countdown finished
+                document.getElementById('countdownDays').textContent = '00';
+                document.getElementById('countdownHours').textContent = '00';
+                document.getElementById('countdownMinutes').textContent = '00';
+                document.getElementById('countdownSeconds').textContent = '00';
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('countdownDays').textContent = days.toString().padStart(2, '0');
+            document.getElementById('countdownHours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('countdownMinutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('countdownSeconds').textContent = seconds.toString().padStart(2, '0');
+        }
+
+        // Update immediately
+        update();
+
+        // Update every second
+        setInterval(update, 1000);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCountdown();
+    });
+
+
+        // Mobile menu toggle
+        function setupMobileMenu() {
+            const menuBtn = document.getElementById('menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            menuBtn.addEventListener('click', () => {
+                menuBtn.classList.toggle('open');
+                mobileMenu.classList.toggle('open');
+            });
+        }
+
+        // Sticky nav scroll effect
+        function setupStickyNav() {
+            const nav = document.querySelector('.sticky-nav');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    nav.classList.add('scrolled');
+                } else {
+                    nav.classList.remove('scrolled');
+                }
+            });
+        }
+
+        // Smooth scrolling for anchor links
+        function setupSmoothScrolling() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        // Close mobile menu if open
+                        const menuBtn = document.getElementById('menu-btn');
+                        const mobileMenu = document.getElementById('mobile-menu');
+                        if (menuBtn.classList.contains('open')) {
+                            menuBtn.classList.remove('open');
+                            mobileMenu.classList.remove('open');
+                        }
+                        
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        }
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initFundingChart();
+            animateCounters();
+            updateCountdown();
+            setupMobileMenu();
+            setupStickyNav();
+            setupSmoothScrolling();
+            
+            // Add animation class to sections when they come into view
+            const animateSections = document.querySelectorAll('.animate-section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            animateSections.forEach(section => {
+                section.style.opacity = 0;
+                section.style.transform = 'translateY(20px)';
+                section.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
