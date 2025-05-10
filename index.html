@@ -527,12 +527,13 @@
             <!-- Money Counter -->
             <div class="mb-12">
                 <div class="money-counter mb-2">
-                    £<span id="moneyCounter">0</span> raised of £1,000,000 goal
+                    £<span id="moneyCounter">10</span> raised of £1,000,000 goal
                 </div>
                 <div class="w-full bg-gray-800 rounded-full h-3 max-w-2xl mx-auto">
-                    <div class="h-3 rounded-full" style="background: linear-gradient(90deg, var(--electric-blue), #00d1ff); width: 0%; transition: width 1s ease;" id="moneyProgress"></div>
+                    <div class="h-3 rounded-full" style="background: linear-gradient(90deg, var(--electric-blue), #00d1ff); width: 0.5%; transition: width 1s ease;" id="moneyProgress"></div>
+                    </div>
                 </div>
-            </div>
+                
             
             <!-- Countdown Timer -->
             <div class="flex justify-center space-x-4 mb-12">
@@ -949,26 +950,36 @@
             });
         
 
-        // Animated counters
-        function animateCounters() {
-            // Money counter
-            const moneyCounter = document.getElementById('moneyCounter');
-            const moneyProgress = document.getElementById('moneyProgress');
-            const targetAmount = 0; // Start from 0
-            
-            let currentAmount = 0;
-            const duration = 2000;
-            const increment = targetAmount / (duration / 16);
-            
-            const moneyInterval = setInterval(() => {
-                currentAmount += increment;
-                if (currentAmount >= targetAmount) {
-                    clearInterval(moneyInterval);
-                    currentAmount = targetAmount;
-                }
-                moneyCounter.textContent = Math.floor(currentAmount).toLocaleString();
-                moneyProgress.style.width = `${(currentAmount / 1000000) * 100}%`;
-            }, 16);
+            function animateCounters() {
+    const moneyCounter = document.getElementById('moneyCounter');
+    const moneyProgress = document.getElementById('moneyProgress');
+    const raisedAmount = 10; // Amount raised (£2)
+    const goalAmount = 1000000; // Goal (£1,000,000)
+
+    let currentAmount = 0;
+    const duration = 2000;
+    const increment = raisedAmount / (duration / 16);
+
+    const moneyInterval = setInterval(() => {
+        currentAmount += increment;
+        if (currentAmount >= raisedAmount) {
+            clearInterval(moneyInterval);
+            currentAmount = raisedAmount;
+        }
+
+        moneyCounter.textContent = Math.floor(currentAmount).toLocaleString();
+
+        // Calculate progress safely
+        let progressPercentage = (currentAmount / goalAmount) * 100;
+        if (progressPercentage < 0.5 && currentAmount > 0) {
+            progressPercentage = 0.5; // Minimum visible bar
+        }
+
+        moneyProgress.style.width = `${progressPercentage}%`;
+    }, 16);
+}
+
+window.addEventListener('load', animateCounters);
             
             // Community counters
             const counters = [
@@ -993,7 +1004,7 @@
                     element.textContent = Math.floor(current).toLocaleString();
                 }, 16);
             });
-        }
+        
         
     
 function updateCountdown() {
